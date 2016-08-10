@@ -109,6 +109,7 @@
       <TreatWarningAsError>true</TreatWarningAsError>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <MinimalRebuild>false</MinimalRebuild>
+      <AdditionalIncludeDirectories>include;source;assets;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -117,6 +118,7 @@
     <Manifest>
       <EnableDpiAwareness>PerMonitorHighDPIAware</EnableDpiAwareness>
     </Manifest>
+    <FxCompile />
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
@@ -159,33 +161,43 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="Cameraclass.cpp" />
-    <ClCompile Include="Colorshaderclass.cpp" />
-    <ClCompile Include="D3dclass.cpp" />
-    <ClCompile Include="Graphicsclass.cpp" />
-    <ClCompile Include="Inputclass.cpp" />
-    <ClCompile Include="main.cpp" />
-    <ClCompile Include="Modelclass.cpp" />
-    <ClCompile Include="Systemclass.cpp" />
-    <ClCompile Include="Textureclass.cpp" />
-    <ClCompile Include="Textureshaderclass.cpp" />
+    <None Include="assets\shaders\Color.ps" />
+    <None Include="assets\shaders\Color.vs" />
+    <None Include="assets\shaders\Texture.ps" />
+    <None Include="assets\shaders\Texture.vs" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Cameraclass.h" />
-    <ClInclude Include="Colorshaderclass.h" />
-    <ClInclude Include="D3dclass.h" />
-    <ClInclude Include="Graphicsclass.h" />
-    <ClInclude Include="Inputclass.h" />
-    <ClInclude Include="Modelclass.h" />
-    <ClInclude Include="Systemclass.h" />
-    <ClInclude Include="Textureclass.h" />
-    <ClInclude Include="Textureshaderclass.h" />
+    <FxCompile Include="assets\shaders\Light.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+    </FxCompile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="Color.ps" />
-    <None Include="Color.vs" />
-    <None Include="Texture.ps" />
-    <None Include="Texture.vs" />
+    <Image Include="assets\images\stone01.tga" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="source\Cameraclass.cpp" />
+    <ClCompile Include="source\Colorshaderclass.cpp" />
+    <ClCompile Include="source\D3dclass.cpp" />
+    <ClCompile Include="source\Graphicsclass.cpp" />
+    <ClCompile Include="source\Inputclass.cpp" />
+    <ClCompile Include="source\Lightclass.cpp" />
+    <ClCompile Include="source\Lightshaderclass.cpp" />
+    <ClCompile Include="source\main.cpp" />
+    <ClCompile Include="source\Modelclass.cpp" />
+    <ClCompile Include="source\Systemclass.cpp" />
+    <ClCompile Include="source\Textureclass.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="include\Cameraclass.h" />
+    <ClInclude Include="include\Colorshaderclass.h" />
+    <ClInclude Include="include\D3dclass.h" />
+    <ClInclude Include="include\Graphicsclass.h" />
+    <ClInclude Include="include\Inputclass.h" />
+    <ClInclude Include="include\Lightclass.h" />
+    <ClInclude Include="include\Lightshaderclass.h" />
+    <ClInclude Include="include\Modelclass.h" />
+    <ClInclude Include="include\Systemclass.h" />
+    <ClInclude Include="include\Textureclass.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
