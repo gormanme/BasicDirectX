@@ -246,7 +246,6 @@ void TextureShaderClass::OutputShaderErrorMessage(ID3DBlob* errorMessage, HWND h
 {
     char* compileErrors = nullptr;
     unsigned long long bufferSize = 0;
-    unsigned long long i = 0;
     ofstream fout = {};
 
 
@@ -260,10 +259,7 @@ void TextureShaderClass::OutputShaderErrorMessage(ID3DBlob* errorMessage, HWND h
     fout.open("shader-error.txt");
 
     //Write out error message
-    for (i = 0; i<bufferSize; i++)
-    {
-        fout << compileErrors[i];
-    }
+    fout << compileErrors;
 
     //Close the file
     fout.close();
