@@ -12,6 +12,7 @@ cbuffer MatrixBuffer
 
 cbuffer LightBuffer
 {
+	float4 ambientColor;
     float4 diffuseColor;
     float3 lightDirection;
     float padding;
@@ -71,14 +72,23 @@ float4 LightPixelShader(PixelInputType input) : SV_TARGET
     //Sample pixel color from texture using sampler at this texture coordinate location
     textureColor = shaderTexture.Sample(SampleType, input.tex);
 
+	//Set the default output color to the ambient light value for all pixels
+	color = ambientColor;
+
     //Invert light direction for calculations
     lightDir = -lightDirection;
 
     //Calculate amount of light on this pixel
     lightIntensity = saturate(dot(input.normal, lightDir));
 
-    //Determine final amount of diffuse color based on diffuse color combine with light intensity
-    color = saturate(diffuseColor * lightIntensity);
+	if (lightIntensity > 0.0f)
+	{
+		//Determine final diffuse color based on diffuse color and amount of light intensity
+		color += (diffuseColor * lightIntensity);
+	}
+
+	//Saturate final light color
+	color = saturate(color);
 
     //Multiply texture pixel and final diffuse color to get fina lpixel color result
     color = color * textureColor;
