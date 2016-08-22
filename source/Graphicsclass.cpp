@@ -61,7 +61,7 @@ bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 	}
 
 	//Initialize Model object
-	result = m_Model->Initialize(m_Direct3D->GetDevice(), m_Direct3D->GetDeviceContext(), "assets/images/stone01.tga");
+	result = m_Model->Initialize(m_Direct3D->GetDevice(), m_Direct3D->GetDeviceContext(), "assets/objects/cube.txt", "assets/images/stone01.tga");
 	if (!result)
 	{
 		MessageBox(hwnd, L"Could not initialize the model object.", L"Error", MB_OK);
@@ -83,23 +83,8 @@ bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
     m_Light = new LightClass();
 
     //Initialize light object
-    m_Light->SetDiffuseColor(1.0f, 0.0f, 1.0f, 1.0f); //Purple light
+    m_Light->SetDiffuseColor(1.0f, 1.0f, 1.0f, 1.0f); //Purple light
     m_Light->SetDirection(0.0f, 0.0f, 1.0f); //Pointing down positive Z axis
-
-	////Create the color shader object
-	//m_ColorShader = new ColorShaderClass();
-	//if (!m_ColorShader)
-	//{
-	//	return false;
-	//}
-
-	////Initialize the color shader object
-	//result = m_ColorShader->Initialize(m_Direct3D->GetDevice(), hwnd);
-	//if (!result)
-	//{
-	//	MessageBox(hwnd, L"Could not initialize the color shader object.", L"Error", MB_OK);
-	//	return false;
-	//}
 
     return true;
 }
@@ -107,14 +92,6 @@ bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 
 void GraphicsClass::Shutdown()
 {
-
-	//// Release the color shader object.
-	//if (m_ColorShader)
-	//{
-	//	m_ColorShader->Shutdown();
-	//	delete m_ColorShader;
-	//	m_ColorShader = 0;
-	//}
 
     // Release the light object.
     if (m_Light)
