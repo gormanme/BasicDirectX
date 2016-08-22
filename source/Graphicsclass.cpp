@@ -84,8 +84,10 @@ bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 
     //Initialize light object
 	m_Light->SetAmbientColor(0.15f, 0.15f, 0.15f, 1.0f); //15% white color
-    m_Light->SetDiffuseColor(1.0f, 1.0f, 1.0f, 1.0f); //Purple light
-    m_Light->SetDirection(1.0f, 0.0f, 0.0f); //Pointing down positive X axis in order to see ambient lighting
+    m_Light->SetDiffuseColor(1.0f, 1.0f, 1.0f, 1.0f); //White light
+    m_Light->SetDirection(0.0f, 0.0f, 1.0f); //Pointing down positive Z axis.
+	m_Light->SetSpecularColor(1.0f, 1.0f, 1.0f, 1.0f); //White
+	m_Light->SetSpecularPower(32.0f); //The lower the specular power, the greater the specular effect.
 
     return true;
 }
@@ -183,24 +185,11 @@ bool GraphicsClass::Render(float rotation)
 
     //Render model using color shader
     result = m_LightShader->Render(m_Direct3D->GetDeviceContext(), m_Model->GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix, 
-        m_Model->GetTexture(), m_Light->GetDirection(),m_Light->GetAmbientColor(), m_Light->GetDiffuseColor());
+        m_Model->GetTexture(), m_Light->GetDirection(),m_Light->GetAmbientColor(), m_Light->GetDiffuseColor(), m_Camera->GetPosition(),
+		m_Light->GetSpecularColor(), m_Light->GetSpecularPower());
     if (!result)
     {
     	return false;
-    }
-
-	//Render model using color shader
-	//result = m_ColorShader->Render(m_Direct3D->GetDeviceContext(), m_Model->GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix);
-	//if (!result)
-	//{
-	//	return false;
-	//}
-
-    //Render the model using the texture shader
-    result = m_LightShader->Render(m_Direct3D->GetDeviceContext(), m_Model->GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix, m_Model->GetTexture(), m_Light->GetDirection(), m_Light->GetAmbientColor(), m_Light->GetDiffuseColor());
-    if (!result)
-    {
-        return false;
     }
 
 	//Present the rendered scene to the screen

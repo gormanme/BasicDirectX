@@ -36,6 +36,18 @@ void LightClass::SetDirection(float x, float y, float z)
 }
 
 
+void LightClass::SetSpecularColor(float red, float green, float blue, float alpha)
+{
+	m_specularColor = DirectX::XMFLOAT4(red, green, blue, alpha);
+}
+
+
+void LightClass::SetSpecularPower(float power)
+{
+	m_specularPower = power;
+}
+
+
 DirectX::XMFLOAT4 LightClass::GetAmbientColor()
 {
 	return m_ambientColor;
@@ -51,4 +63,16 @@ DirectX::XMFLOAT4 LightClass::GetDiffuseColor()
 DirectX::XMFLOAT3 LightClass::GetDirection()
 {
     return m_direction;
+}
+
+
+DirectX::XMFLOAT4 LightClass::GetSpecularColor()
+{
+	return m_specularColor;
+}
+
+
+float LightClass::GetSpecularPower()
+{
+	return m_specularPower;
 }
