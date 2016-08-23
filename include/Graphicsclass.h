@@ -8,6 +8,7 @@
 //#include "colorshaderclass.h"
 #include "lightshaderclass.h"
 #include "lightclass.h"
+#include "bitmapclass.h"
 
 //--- Globals ---//
 const bool VSYNC_ENABLED = true;
@@ -30,9 +31,10 @@ private:
 
 private:
     D3DClass* m_Direct3D;
-	CameraClass* m_Camera;
-	ModelClass* m_Model;
+    CameraClass* m_Camera;
+    ModelClass* m_Model;
 //	ColorShaderClass* m_ColorShader;
     LightShaderClass* m_LightShader;
     LightClass* m_Light;
+    BitmapClass* m_Bitmap;
 };

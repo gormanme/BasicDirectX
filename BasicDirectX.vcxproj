@@ -175,6 +175,7 @@
     <Image Include="assets\images\stone01.tga" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="source\Bitmapclass.cpp" />
     <ClCompile Include="source\Cameraclass.cpp" />
     <ClCompile Include="source\Colorshaderclass.cpp" />
     <ClCompile Include="source\D3dclass.cpp" />
@@ -188,6 +189,7 @@
     <ClCompile Include="source\Textureclass.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="include\Bitmapclass.h" />
     <ClInclude Include="include\Cameraclass.h" />
     <ClInclude Include="include\Colorshaderclass.h" />
     <ClInclude Include="include\D3dclass.h" />
