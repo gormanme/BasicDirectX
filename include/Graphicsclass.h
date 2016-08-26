@@ -9,6 +9,7 @@
 #include "lightshaderclass.h"
 #include "lightclass.h"
 #include "bitmapclass.h"
+#include "textclass.h"
 
 //--- Globals ---//
 const bool VSYNC_ENABLED = true;
@@ -37,4 +38,5 @@ private:
     LightShaderClass* m_LightShader;
     LightClass* m_Light;
     BitmapClass* m_Bitmap;
+	TextClass* m_Text;
 };

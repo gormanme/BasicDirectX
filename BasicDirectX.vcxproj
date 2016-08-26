@@ -167,6 +167,9 @@
     <None Include="assets\shaders\Texture.vs" />
   </ItemGroup>
   <ItemGroup>
+    <FxCompile Include="assets\shaders\Font.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+    </FxCompile>
     <FxCompile Include="assets\shaders\Light.hlsl">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
     </FxCompile>
@@ -179,6 +182,8 @@
     <ClCompile Include="source\Cameraclass.cpp" />
     <ClCompile Include="source\Colorshaderclass.cpp" />
     <ClCompile Include="source\D3dclass.cpp" />
+    <ClCompile Include="source\Fontclass.cpp" />
+    <ClCompile Include="source\Fontshaderclass.cpp" />
     <ClCompile Include="source\Graphicsclass.cpp" />
     <ClCompile Include="source\Inputclass.cpp" />
     <ClCompile Include="source\Lightclass.cpp" />
@@ -186,6 +191,7 @@
     <ClCompile Include="source\main.cpp" />
     <ClCompile Include="source\Modelclass.cpp" />
     <ClCompile Include="source\Systemclass.cpp" />
+    <ClCompile Include="source\Textclass.cpp" />
     <ClCompile Include="source\Textureclass.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -193,12 +199,15 @@
     <ClInclude Include="include\Cameraclass.h" />
     <ClInclude Include="include\Colorshaderclass.h" />
     <ClInclude Include="include\D3dclass.h" />
+    <ClInclude Include="include\Fontclass.h" />
+    <ClInclude Include="include\Fontshaderclass.h" />
     <ClInclude Include="include\Graphicsclass.h" />
     <ClInclude Include="include\Inputclass.h" />
     <ClInclude Include="include\Lightclass.h" />
     <ClInclude Include="include\Lightshaderclass.h" />
     <ClInclude Include="include\Modelclass.h" />
     <ClInclude Include="include\Systemclass.h" />
+    <ClInclude Include="include\Textclass.h" />
     <ClInclude Include="include\Textureclass.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

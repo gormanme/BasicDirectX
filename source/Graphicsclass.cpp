@@ -9,6 +9,7 @@ GraphicsClass::GraphicsClass()
     m_LightShader = 0;
     m_Light = 0;
     m_Bitmap = 0;
+	m_Text = 0;
 }
 
 
@@ -27,13 +28,10 @@ GraphicsClass::~GraphicsClass()
 bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 {
     bool result = true;
+	DirectX::XMMATRIX baseViewMatrix = {};
 
     //Create the Direct3D object
     m_Direct3D = new D3DClass();
-    if (!m_Direct3D)
-    {
-        return false;
-    }
 
     //Initialize the Direct3D object
     result = m_Direct3D->Initialize(screenWidth, screenHeight, VSYNC_ENABLED, hwnd, SCREEN_DEPTH, SCREEN_NEAR);
@@ -46,60 +44,65 @@ bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
     //Code added here for drawing triangle (camera, model, and shader classes)
     //Create camera object
     m_Camera = new CameraClass();
-    if (!m_Camera)
-    {
-        return false;
-    }
 
-    //Set initial position of camera
-    m_Camera->SetPosition(0.0f, 0.0f, -5.0f);
+    //Initialize a base view matrix with the camera for 2D user interface rendering
+    m_Camera->SetPosition(0.0f, 0.0f, -1.0f);
+	m_Camera->Render();
+	m_Camera->GetViewMatrix(baseViewMatrix);
 
-    //Create Model object
-    m_Model = new ModelClass();
-    if (!m_Model)
-    {
-        return false;
-    }
+	//Create the text object
+	m_Text = new TextClass();
 
-    //Initialize Model object
-    result = m_Model->Initialize(m_Direct3D->GetDevice(), m_Direct3D->GetDeviceContext(), "assets/objects/cube.txt", "assets/images/stone01.tga");
-    if (!result)
-    {
-        MessageBox(hwnd, L"Could not initialize the model object.", L"Error", MB_OK);
-        return false;
-    }
+	//Initialize the text object
+	result = m_Text->Initialize(m_Direct3D->GetDevice(), m_Direct3D->GetDeviceContext(), hwnd, screenWidth, screenHeight, baseViewMatrix);
+	if (!result)
+	{
+		MessageBox(hwnd, L"Could not initialize the text object.", L"Error", MB_OK);
+		return false;
+	}
 
-    //Create the light shader object
-    m_LightShader = new LightShaderClass();
+    ////Create Model object
+    //m_Model = new ModelClass();
 
-    //Initialize the light shader object
-    result = m_LightShader->Initialize(m_Direct3D->GetDevice(), hwnd);
-    if (!result)
-    {
-        MessageBox(hwnd, L"Could not initialize the light shader object.", L"Error", MB_OK);
-        return false;
-    }
+    ////Initialize Model object
+    //result = m_Model->Initialize(m_Direct3D->GetDevice(), m_Direct3D->GetDeviceContext(), "assets/objects/cube.txt", "assets/images/stone01.tga");
+    //if (!result)
+    //{
+    //    MessageBox(hwnd, L"Could not initialize the model object.", L"Error", MB_OK);
+    //    return false;
+    //}
 
-    //Create light object
-    m_Light = new LightClass();
+    ////Create the light shader object
+    //m_LightShader = new LightShaderClass();
 
-    //Initialize light object
-    m_Light->SetAmbientColor(1.0f, 1.0f, 1.0f, 1.0f); //15% white color
-    m_Light->SetDiffuseColor(1.0f, 1.0f, 1.0f, 1.0f); //White light
-    m_Light->SetDirection(0.0f, 0.0f, 1.0f); //Pointing down positive Z axis.
-    m_Light->SetSpecularColor(1.0f, 1.0f, 1.0f, 1.0f); //White
-    m_Light->SetSpecularPower(32.0f); //The lower the specular power, the greater the specular effect.
+    ////Initialize the light shader object
+    //result = m_LightShader->Initialize(m_Direct3D->GetDevice(), hwnd);
+    //if (!result)
+    //{
+    //    MessageBox(hwnd, L"Could not initialize the light shader object.", L"Error", MB_OK);
+    //    return false;
+    //}
 
-    //Create the bitmap object
-    m_Bitmap = new BitmapClass();
+    ////Create light object
+    //m_Light = new LightClass();
 
-    //Initialize the bitmap object
-    result = m_Bitmap->Initialize(m_Direct3D->GetDevice(), m_Direct3D->GetDeviceContext(), screenWidth, screenHeight, "assets/images/stone01.tga", 256, 256);
-    if (!result)
-    {
-        MessageBox(hwnd, L"Could not initialize the bitmap object.", L"Error", MB_OK);
-        return false;
-    }
+    ////Initialize light object
+    //m_Light->SetAmbientColor(1.0f, 1.0f, 1.0f, 1.0f); //15% white color
+    //m_Light->SetDiffuseColor(1.0f, 1.0f, 1.0f, 1.0f); //White light
+    //m_Light->SetDirection(0.0f, 0.0f, 1.0f); //Pointing down positive Z axis.
+    //m_Light->SetSpecularColor(1.0f, 1.0f, 1.0f, 1.0f); //White
+    //m_Light->SetSpecularPower(32.0f); //The lower the specular power, the greater the specular effect.
+
+    ////Create the bitmap object
+    //m_Bitmap = new BitmapClass();
+
+    ////Initialize the bitmap object
+    //result = m_Bitmap->Initialize(m_Direct3D->GetDevice(), m_Direct3D->GetDeviceContext(), screenWidth, screenHeight, "assets/images/stone01.tga", 256, 256);
+    //if (!result)
+    //{
+    //    MessageBox(hwnd, L"Could not initialize the bitmap object.", L"Error", MB_OK);
+    //    return false;
+    //}
 
     return true;
 }
@@ -107,6 +110,14 @@ bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 
 void GraphicsClass::Shutdown()
 {
+
+	// Release the text object.
+	if (m_Text)
+	{
+		m_Text->Shutdown();
+		delete m_Text;
+		m_Text = 0;
+	}
 
     // Release the bitmap object.
     if (m_Bitmap)
@@ -203,12 +214,25 @@ bool GraphicsClass::Render(float rotation)
     //Turn off Z buffer to begin all 2D rendering
     m_Direct3D->TurnZBufferOff();
 
-    //Put bitmap vertex and index buffers on graphics pipeline to prepare them for drawing
-    result = m_Bitmap->Render(m_Direct3D->GetDeviceContext(), 100, 100);
-    if (!result)
-    {
-        return false;
-    }
+	//Turn on alpha blending before rendering the text
+	m_Direct3D->TurnOnAlphaBlending();
+
+	//Render the text strings
+	result = m_Text->Render(m_Direct3D->GetDeviceContext(), worldMatrix, orthoMatrix);
+	if (!result)
+	{
+		return false;
+	}
+
+	//Turn off alpha blending after rendering the text
+	m_Direct3D->TurnOffAlphaBlending();
+
+    ////Put bitmap vertex and index buffers on graphics pipeline to prepare them for drawing
+    //result = m_Bitmap->Render(m_Direct3D->GetDeviceContext(), 100, 100);
+    //if (!result)
+    //{
+    //    return false;
+    //}
 
     //Render the bitmap with the texture shader
     //result = m_TextureShader->Render(m_Direct3D->GetDeviceContext(), m_Bitmap->GetIndexCount(), worldMatrix, viewMatrix, orthoMatrix, m_Bitmap->GetTexture());
@@ -217,8 +241,8 @@ bool GraphicsClass::Render(float rotation)
     //	return false;
     //}
 
-    //Turn the Z buffer back on now that all 2D rendering has completed
-    m_Direct3D->TurnZBufferOn();
+    ////Turn the Z buffer back on now that all 2D rendering has completed
+    //m_Direct3D->TurnZBufferOn();
 
  //   //Rotate world matrix by rotation value so that the triangle will spin
  //   worldMatrix = DirectX::XMMatrixRotationY(rotation);
@@ -227,9 +251,9 @@ bool GraphicsClass::Render(float rotation)
     //m_Model->Render(m_Direct3D->GetDeviceContext());
 
     //Render model using color shader
-    result = m_LightShader->Render(m_Direct3D->GetDeviceContext(), m_Bitmap->GetIndexCount(), worldMatrix, viewMatrix, orthoMatrix,
-        m_Bitmap->GetTexture(), m_Light->GetDirection(), m_Light->GetAmbientColor(), m_Light->GetDiffuseColor(), m_Camera->GetPosition(),
-        m_Light->GetSpecularColor(), m_Light->GetSpecularPower());
+    //result = m_LightShader->Render(m_Direct3D->GetDeviceContext(), m_Bitmap->GetIndexCount(), worldMatrix, viewMatrix, orthoMatrix,
+    //    m_Bitmap->GetTexture(), m_Light->GetDirection(), m_Light->GetAmbientColor(), m_Light->GetDiffuseColor(), m_Camera->GetPosition(),
+    //    m_Light->GetSpecularColor(), m_Light->GetSpecularPower());
   //  result = m_LightShader->Render(m_Direct3D->GetDeviceContext(), m_Model->GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix, 
   //      m_Model->GetTexture(), m_Light->GetDirection(),m_Light->GetAmbientColor(), m_Light->GetDiffuseColor(), m_Camera->GetPosition(),
         //m_Light->GetSpecularColor(), m_Light->GetSpecularPower());
