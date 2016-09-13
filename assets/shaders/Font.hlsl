@@ -16,7 +16,7 @@ cbuffer PixelBuffer
 struct VertexInputType
 {
 	float4 position : POSITION;
-	float2 tex : TECXOORD0;
+	float2 tex : TEXCOORD0;
 };
 
 struct PixelInputType

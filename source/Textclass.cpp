@@ -37,7 +37,7 @@ bool TextClass::Initialize(ID3D11Device* device, ID3D11DeviceContext* deviceCont
 	m_Font = new FontClass();
 
 	//Initialize the font object
-	result = m_Font->Initialize(device, deviceContext, "assets/fonts/fontdata.txt", "assets/fonts/font.dds");
+	result = m_Font->Initialize(device, deviceContext, "assets/fonts/fontdata.txt", "assets/fonts/font.tga");
 	if (!result)
 	{
 		MessageBox(hwnd, L"Could not initialize the font object.", L"Error", MB_OK);
