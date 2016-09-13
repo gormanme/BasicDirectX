@@ -4,6 +4,9 @@ SystemClass::SystemClass()
 {
     m_Input = 0;
     m_Graphics = 0;
+    m_Fps = 0;
+    m_Cpu = 0;
+    m_Timer = 0;
 }
 
 
@@ -30,20 +33,12 @@ bool SystemClass::Initialize()
 
     //Create the input object. This object will be used to handle reading the keyboard input from the user.
     m_Input = new InputClass();
-    if(!m_Input)
-    {
-        return false;
-    }
 
     //Initialize the input object
     m_Input->Initialize();
 
     //Create the graphics object. This object will handle rendering all the graphcis for this application.
     m_Graphics = new GraphicsClass();
-    if (!m_Graphics)
-    {
-        return false;
-    }
 
     //Initialize the graphics object
     result = m_Graphics->Initialize(screenWidth, screenHeight, m_hwnd);
@@ -52,14 +47,53 @@ bool SystemClass::Initialize()
         return false;
     }
 
-    return true;
+    //Create and initialize the FPS object
+    m_Fps = new FpsClass();
+    m_Fps->Initialize();
 
+    //Create and initialize the CPU object
+    m_Cpu = new CpuClass();
+    m_Cpu->Initialize();
+
+    //Create and initialize the Timer object
+    m_Timer = new TimerClass();
+    result = m_Timer->Initialize();
+    if (!result)
+    {
+        MessageBox(m_hwnd, L"Could not initialize the Timer object.", L"Error", MB_OK);
+        return false;
+    }
+
+    return true;
 }
 
 
 //--- Shutdown(): Does all necessary cleanup/releasing for the graphcis and input objects. Also shuts down window and handles. ---//
 void SystemClass::Shutdown()
 {
+
+    // Release the timer object
+    if (m_Timer)
+    {
+        delete m_Timer;
+        m_Timer = 0;
+    }
+
+    // Release the cpu object
+    if (m_Cpu)
+    {
+        m_Cpu->Shutdown();
+        delete m_Cpu;
+        m_Cpu = 0;
+    }
+
+    // Release the fps object
+    if (m_Fps)
+    {
+        delete m_Fps;
+        m_Fps = 0;
+    }
+
     //Release the graphics object
     if (m_Graphics)
     {
@@ -121,15 +155,20 @@ bool SystemClass::Frame()
 {
     bool result = true;
 
-    //Check if the user pressed escape and wants to exit the application
-    if (m_Input->IsKeyDown(VK_ESCAPE))
+    //Update the system stats
+    m_Timer->Frame();
+    m_Fps->Frame();
+    m_Cpu->Frame();
+
+    // Do the frame processing for the graphics object
+    result = m_Graphics->Frame(m_Fps->GetFps(), m_Cpu->GetCpuPercentage());
+    if (!result)
     {
         return false;
     }
 
-    //Do the frame processing for the graphics object
-    result = m_Graphics->Frame();
-    if (!result)
+    //Check if the user pressed escape and wants to exit the application
+    if (m_Input->IsKeyDown(VK_ESCAPE))
     {
         return false;
     }
@@ -194,7 +233,7 @@ void SystemClass::InitializeWindows(int& screenWidth, int& screenHeight)
     wc.hIcon = LoadIcon(NULL, IDI_WINLOGO);
     wc.hIconSm = wc.hIcon;
     wc.hCursor = LoadCursor(NULL, IDC_ARROW);
-	wc.hbrBackground = (HBRUSH)GetStockObject(BLACK_BRUSH);
+    wc.hbrBackground = (HBRUSH)GetStockObject(BLACK_BRUSH);
     wc.lpszMenuName = NULL;
     wc.lpszClassName = m_applicationName;
     wc.cbSize = sizeof(WNDCLASSEX);
@@ -202,13 +241,13 @@ void SystemClass::InitializeWindows(int& screenWidth, int& screenHeight)
     // Register the window class
     RegisterClassEx(&wc);
 
-	// If windowed then set it to 800x600 resolution.
-	screenWidth = 800;
-	screenHeight = 600;
+    // If windowed then set it to 800x600 resolution.
+    screenWidth = 800;
+    screenHeight = 600;
 
-	// Place the window in the middle of the screen.
-	posX = (GetSystemMetrics(SM_CXSCREEN) - screenWidth) / 2;
-	posY = (GetSystemMetrics(SM_CYSCREEN) - screenHeight) / 2;
+    // Place the window in the middle of the screen.
+    posX = (GetSystemMetrics(SM_CXSCREEN) - screenWidth) / 2;
+    posY = (GetSystemMetrics(SM_CYSCREEN) - screenHeight) / 2;
 
     // Create the window with the screen settings and get the handle to it
     m_hwnd = CreateWindowEx(WS_EX_APPWINDOW, m_applicationName, m_applicationName,

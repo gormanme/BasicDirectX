@@ -9,7 +9,7 @@ GraphicsClass::GraphicsClass()
     m_LightShader = 0;
     m_Light = 0;
     m_Bitmap = 0;
-	m_Text = 0;
+    m_Text = 0;
 }
 
 
@@ -28,7 +28,7 @@ GraphicsClass::~GraphicsClass()
 bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 {
     bool result = true;
-	DirectX::XMMATRIX baseViewMatrix = {};
+    DirectX::XMMATRIX baseViewMatrix = {};
 
     //Create the Direct3D object
     m_Direct3D = new D3DClass();
@@ -47,19 +47,19 @@ bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 
     //Initialize a base view matrix with the camera for 2D user interface rendering
     m_Camera->SetPosition(0.0f, 0.0f, -1.0f);
-	m_Camera->Render();
-	m_Camera->GetViewMatrix(baseViewMatrix);
+    m_Camera->Render();
+    m_Camera->GetViewMatrix(baseViewMatrix);
 
-	//Create the text object
-	m_Text = new TextClass();
+    //Create the text object
+    m_Text = new TextClass();
 
-	//Initialize the text object
-	result = m_Text->Initialize(m_Direct3D->GetDevice(), m_Direct3D->GetDeviceContext(), hwnd, screenWidth, screenHeight, baseViewMatrix);
-	if (!result)
-	{
-		MessageBox(hwnd, L"Could not initialize the text object.", L"Error", MB_OK);
-		return false;
-	}
+    //Initialize the text object
+    result = m_Text->Initialize(m_Direct3D->GetDevice(), m_Direct3D->GetDeviceContext(), hwnd, screenWidth, screenHeight, baseViewMatrix);
+    if (!result)
+    {
+        MessageBox(hwnd, L"Could not initialize the text object.", L"Error", MB_OK);
+        return false;
+    }
 
     ////Create Model object
     //m_Model = new ModelClass();
@@ -111,13 +111,13 @@ bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 void GraphicsClass::Shutdown()
 {
 
-	// Release the text object.
-	if (m_Text)
-	{
-		m_Text->Shutdown();
-		delete m_Text;
-		m_Text = 0;
-	}
+    // Release the text object.
+    if (m_Text)
+    {
+        m_Text->Shutdown();
+        delete m_Text;
+        m_Text = 0;
+    }
 
     // Release the bitmap object.
     if (m_Bitmap)
@@ -167,10 +167,24 @@ void GraphicsClass::Shutdown()
 }
 
 
-bool GraphicsClass::Frame()
+bool GraphicsClass::Frame(int fps, int cpu)
 {
     bool result = true;
     static float rotation = 0.0f;
+
+    //Set the frames per second
+    result = m_Text->SetFps(fps, m_Direct3D->GetDeviceContext());
+    if (!result)
+    {
+        return false;
+    }
+
+    //Set the CPU usage
+    result = m_Text->SetCpu(cpu, m_Direct3D->GetDeviceContext());
+    if (!result)
+    {
+        return false;
+    }
 
     //Update rotation variable each frame
     rotation += (float)DirectX::XM_PI * 0.005f;
@@ -214,18 +228,18 @@ bool GraphicsClass::Render(float rotation)
     //Turn off Z buffer to begin all 2D rendering
     m_Direct3D->TurnZBufferOff();
 
-	//Turn on alpha blending before rendering the text
-	m_Direct3D->TurnOnAlphaBlending();
+    //Turn on alpha blending before rendering the text
+    m_Direct3D->TurnOnAlphaBlending();
 
-	//Render the text strings
-	result = m_Text->Render(m_Direct3D->GetDeviceContext(), worldMatrix, orthoMatrix);
-	if (!result)
-	{
-		return false;
-	}
+    //Render the text strings
+    result = m_Text->Render(m_Direct3D->GetDeviceContext(), worldMatrix, orthoMatrix);
+    if (!result)
+    {
+        return false;
+    }
 
-	//Turn off alpha blending after rendering the text
-	m_Direct3D->TurnOffAlphaBlending();
+    //Turn off alpha blending after rendering the text
+    m_Direct3D->TurnOffAlphaBlending();
 
     ////Put bitmap vertex and index buffers on graphics pipeline to prepare them for drawing
     //result = m_Bitmap->Render(m_Direct3D->GetDeviceContext(), 100, 100);

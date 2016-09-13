@@ -10,6 +10,11 @@
 #include "inputclass.h"
 #include "graphicsclass.h"
 
+//Includes for FPS, CPU Usage, and Timers
+#include "fpsclass.h"
+#include "cpuclass.h"
+#include "timerclass.h"
+
 //--- SystemClass ---//
 class SystemClass
 {
@@ -31,11 +36,15 @@ private:
 
 private:
     LPCWSTR m_applicationName;
-	HINSTANCE m_hinstance;
+    HINSTANCE m_hinstance;
     HWND m_hwnd;
 
     InputClass* m_Input;
     GraphicsClass* m_Graphics;
+
+    FpsClass* m_Fps;
+    CpuClass* m_Cpu;
+    TimerClass* m_Timer;
 };
 
 //--- Function Prototypes ---//

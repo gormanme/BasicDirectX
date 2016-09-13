@@ -181,9 +181,11 @@
     <ClCompile Include="source\Bitmapclass.cpp" />
     <ClCompile Include="source\Cameraclass.cpp" />
     <ClCompile Include="source\Colorshaderclass.cpp" />
+    <ClCompile Include="source\Cpuclass.cpp" />
     <ClCompile Include="source\D3dclass.cpp" />
     <ClCompile Include="source\Fontclass.cpp" />
     <ClCompile Include="source\Fontshaderclass.cpp" />
+    <ClCompile Include="source\Fpsclass.cpp" />
     <ClCompile Include="source\Graphicsclass.cpp" />
     <ClCompile Include="source\Inputclass.cpp" />
     <ClCompile Include="source\Lightclass.cpp" />
@@ -193,14 +195,17 @@
     <ClCompile Include="source\Systemclass.cpp" />
     <ClCompile Include="source\Textclass.cpp" />
     <ClCompile Include="source\Textureclass.cpp" />
+    <ClCompile Include="source\Timerclass.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\Bitmapclass.h" />
     <ClInclude Include="include\Cameraclass.h" />
     <ClInclude Include="include\Colorshaderclass.h" />
+    <ClInclude Include="include\Cpuclass.h" />
     <ClInclude Include="include\D3dclass.h" />
     <ClInclude Include="include\Fontclass.h" />
     <ClInclude Include="include\Fontshaderclass.h" />
+    <ClInclude Include="include\Fpsclass.h" />
     <ClInclude Include="include\Graphicsclass.h" />
     <ClInclude Include="include\Inputclass.h" />
     <ClInclude Include="include\Lightclass.h" />
@@ -209,6 +214,7 @@
     <ClInclude Include="include\Systemclass.h" />
     <ClInclude Include="include\Textclass.h" />
     <ClInclude Include="include\Textureclass.h" />
+    <ClInclude Include="include\Timerclass.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -12,7 +12,7 @@
 #include "textclass.h"
 
 //--- Globals ---//
-const bool VSYNC_ENABLED = true;
+const bool VSYNC_ENABLED = false;
 const float SCREEN_DEPTH = 1000.0f;
 const float SCREEN_NEAR = 0.1f;
 
@@ -25,7 +25,7 @@ public:
 
     bool Initialize(int, int, HWND);
     void Shutdown();
-    bool Frame();
+    bool Frame(int, int);
 
 private:
     bool Render(float);
