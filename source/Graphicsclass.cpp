@@ -10,6 +10,8 @@ GraphicsClass::GraphicsClass()
     m_Light = 0;
     m_Bitmap = 0;
     m_Text = 0;
+	m_ModelList = 0;
+	m_Frustum = 0;
 }
 
 
@@ -61,37 +63,46 @@ bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
         return false;
     }
 
-    ////Create Model object
-    //m_Model = new ModelClass();
+    //Create Model object
+    m_Model = new ModelClass();
 
-    ////Initialize Model object
-    //result = m_Model->Initialize(m_Direct3D->GetDevice(), m_Direct3D->GetDeviceContext(), "assets/objects/cube.txt", "assets/images/stone01.tga");
-    //if (!result)
-    //{
-    //    MessageBox(hwnd, L"Could not initialize the model object.", L"Error", MB_OK);
-    //    return false;
-    //}
+    //Initialize Model object
+    result = m_Model->Initialize(m_Direct3D->GetDevice(), m_Direct3D->GetDeviceContext(), "assets/objects/sphere.txt", "assets/images/stone01.tga");
+    if (!result)
+    {
+        MessageBox(hwnd, L"Could not initialize the model object.", L"Error", MB_OK);
+        return false;
+    }
 
-    ////Create the light shader object
-    //m_LightShader = new LightShaderClass();
+    //Create the light shader object
+    m_LightShader = new LightShaderClass();
 
-    ////Initialize the light shader object
-    //result = m_LightShader->Initialize(m_Direct3D->GetDevice(), hwnd);
-    //if (!result)
-    //{
-    //    MessageBox(hwnd, L"Could not initialize the light shader object.", L"Error", MB_OK);
-    //    return false;
-    //}
+    //Initialize the light shader object
+    result = m_LightShader->Initialize(m_Direct3D->GetDevice(), hwnd);
+    if (!result)
+    {
+        MessageBox(hwnd, L"Could not initialize the light shader object.", L"Error", MB_OK);
+        return false;
+    }
 
-    ////Create light object
-    //m_Light = new LightClass();
+    //Create light object
+    m_Light = new LightClass();
 
-    ////Initialize light object
+    //Initialize light object
     //m_Light->SetAmbientColor(1.0f, 1.0f, 1.0f, 1.0f); //15% white color
     //m_Light->SetDiffuseColor(1.0f, 1.0f, 1.0f, 1.0f); //White light
-    //m_Light->SetDirection(0.0f, 0.0f, 1.0f); //Pointing down positive Z axis.
+    m_Light->SetDirection(0.0f, 0.0f, 1.0f); //Pointing down positive Z axis.
     //m_Light->SetSpecularColor(1.0f, 1.0f, 1.0f, 1.0f); //White
     //m_Light->SetSpecularPower(32.0f); //The lower the specular power, the greater the specular effect.
+
+	//Create the model list object
+	m_ModelList = new ModelListClass();
+
+	//Initialize the model list object
+	m_ModelList->Initialize(25);
+
+	//Create the frustum object
+	m_Frustum = new FrustumClass();
 
     ////Create the bitmap object
     //m_Bitmap = new BitmapClass();
@@ -110,6 +121,22 @@ bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 
 void GraphicsClass::Shutdown()
 {
+
+	// Release the frustum object.
+	if (m_Frustum)
+	{
+		delete m_Frustum;
+		m_Frustum = 0;
+	}
+
+	// Release the model list object.
+	if (m_ModelList)
+	{
+		m_ModelList->Shutdown();
+		delete m_ModelList;
+		m_ModelList = 0;
+	}
+
 
     // Release the text object.
     if (m_Text)
@@ -167,7 +194,7 @@ void GraphicsClass::Shutdown()
 }
 
 
-bool GraphicsClass::Frame(int fps, int cpu)
+bool GraphicsClass::Frame(int fps, int cpu, float rotationY)
 {
     bool result = true;
     static float rotation = 0.0f;
@@ -186,12 +213,18 @@ bool GraphicsClass::Frame(int fps, int cpu)
         return false;
     }
 
+	//Set the position of the camera
+	m_Camera->SetPosition(0.0f, 0.0f, -10.0f);
+
+	//Set the rotation of the camera
+	m_Camera->SetRotation(0.0f, rotationY, 0.0f);
+
     //Update rotation variable each frame
-    rotation += (float)DirectX::XM_PI * 0.005f;
-    if (rotation > 360.0f)
-    {
-        rotation -= 360.0f;
-    }
+    //rotation += (float)DirectX::XM_PI * 0.005f;
+    //if (rotation > 360.0f)
+    //{
+    //    rotation -= 360.0f;
+    //}
 
     // Render the graphics scene.
     result = Render(rotation);
@@ -211,7 +244,16 @@ bool GraphicsClass::Render(float rotation)
     DirectX::XMMATRIX projectionMatrix = {};
     DirectX::XMMATRIX orthoMatrix = {};
     bool result = true;
-    rotation = 4;
+    rotation = 0;
+	int modelCount = 0;
+	int renderCount = 0;
+	int index = 0;
+	float positionX = 0.0f;
+	float positionY = 0.0f;
+	float positionZ = 0.0f;
+	float radius = 1.0f;
+	DirectX::XMFLOAT4 color = {};
+	bool renderModel = true;
 
     //Clear the buffers to begin the scene
     m_Direct3D->BeginScene(0.0f, 0.0f, 0.0f, 1.0f);
@@ -225,21 +267,48 @@ bool GraphicsClass::Render(float rotation)
     m_Direct3D->GetProjectionMatrix(projectionMatrix);
     m_Direct3D->GetOrthoMatrix(orthoMatrix);
 
+	//Construct the frustum
+	m_Frustum->ConstructFrustum(SCREEN_DEPTH, projectionMatrix, viewMatrix);
+
+	//Get the number of modelss that will be rendered
+	modelCount = m_ModelList->GetModelCount();
+
+	//Go through all the models and render them only if they can be seen by the camera view
+	for (index = 0; i < modelCount; index++)
+	{
+		//Get the position and color of the sphere model at this index
+		m_ModelList->GetData(index, positionX, positionY, positionZ, color);
+
+		//Check if the sphere model is in the view frustum
+		renderModel = m_Frustum->CheckSphere(positionX, positionY, positionZ, radius);
+
+		//If it can be seen then render it, if not skip this model and check the next sphere
+		if (renderModel)
+		{
+			//Move the model to the location it should be rendered at
+			worldMatrix = DirectX::XMMatrixTranslation(positionX, positionY, positionZ);
+
+			//Put the model vertex and insex buffers on the graphics pipeline to prepare them for drawing
+			m_LightShader->Render(m_Direct3D->GetDeviceContext(), m_Model->GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix,
+				m_Model->GetTexture(), m_Light->GetDirection(), color);
+		}
+	}
+
     //Turn off Z buffer to begin all 2D rendering
-    m_Direct3D->TurnZBufferOff();
+    //m_Direct3D->TurnZBufferOff();
 
     //Turn on alpha blending before rendering the text
-    m_Direct3D->TurnOnAlphaBlending();
+    //m_Direct3D->TurnOnAlphaBlending();
 
     //Render the text strings
-    result = m_Text->Render(m_Direct3D->GetDeviceContext(), worldMatrix, orthoMatrix);
-    if (!result)
-    {
-        return false;
-    }
+    //result = m_Text->Render(m_Direct3D->GetDeviceContext(), worldMatrix, orthoMatrix);
+    //if (!result)
+    //{
+    //    return false;
+    //}
 
     //Turn off alpha blending after rendering the text
-    m_Direct3D->TurnOffAlphaBlending();
+    //m_Direct3D->TurnOffAlphaBlending();
 
     ////Put bitmap vertex and index buffers on graphics pipeline to prepare them for drawing
     //result = m_Bitmap->Render(m_Direct3D->GetDeviceContext(), 100, 100);
